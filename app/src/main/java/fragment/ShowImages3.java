@@ -20,7 +20,7 @@
 //import data.ImageInfoData;
 //import tools.FindFileUtil;
 //
-//public class ShowImages3 extends BaseFragment {
+//public class ShowImages3 extends BaseFragment3 {
 //    ViewPager viewpager;
 //
 //    Button bt1, bt2, bt3;
@@ -38,7 +38,7 @@
 //    FindFileUtil findFileUtil2;
 //
 //
-//    BaseFragment<List<ImageInfo>>
+//    BaseFragment3<List<ImageInfo>>
 //            fragmentAll ,
 //            fragmentImage ,
 //            fragmentAudio ,
@@ -52,22 +52,22 @@
 //            if (msg.what == 1) {
 //                alldatas = ImageInfoData.FilesToImageInfos(files);
 //                fragmentAll.setData(alldatas);
-//                findFileUtil2.getScanResult(mHandler, 1000);
+//                findFileUtil2.getScanResult(mHandler, 10000);
 //            }
 //            if (msg.what == 2) {
 //                imagedatas = ImageInfoData.FilesToImageInfos(files);
 //                fragmentImage.setData(imagedatas);
-//                findFileUtil2.getImageScanResult(mHandler, 1000);
+//                findFileUtil2.getImageScanResult(mHandler, 10000);
 //            }
 //            if (msg.what == 3) {
 //                audiodatas = ImageInfoData.FilesToImageInfos(files);
 //                fragmentAudio.setData(audiodatas);
-//                findFileUtil2.getAudioScanResult(mHandler, 1000);
+//                findFileUtil2.getAudioScanResult(mHandler, 10000);
 //            }
 //            if (msg.what == 4) {
-////                vediodatas = ImageInfoData.FilesToImageInfos(files);
-////                fragmentVedio.setData(vediodatas);
-////                findFileUtil2.getVideoScanResult(mHandler,1000);
+//                vediodatas = ImageInfoData.FilesToImageInfos(files);
+//                fragmentVedio.setData(vediodatas);
+//                findFileUtil2.getVideoScanResult(mHandler,10000);
 //            }
 //
 //        }
@@ -88,10 +88,10 @@
 //
 //    void initView(View rootview2) {
 //
-//        fragmentAll = new ListImages(getContext());
-//        fragmentImage = new ListImages(getContext());
-//        fragmentAudio = new ListImages(getContext());
-//        fragmentVedio = new ListImages(getContext());
+//        fragmentAll = new ListImagesCopy3(getContext());
+//        fragmentImage = new ListImagesCopy3(getContext());
+//        fragmentAudio = new ListImagesCopy3(getContext());
+//        fragmentVedio = new ListImagesCopy3(getContext());
 //        findFileUtil2 = FindFileUtil.getNewInstance();
 //        findFileUtil2.getScanResult(mHandler, 1000);
 //        findFileUtil2.getImageScanResult(mHandler, 1000);
@@ -105,12 +105,10 @@
 //        bt2 = (Button) rootview2.findViewById(R.id.fragment_show_button2);
 //        bt3 = (Button) rootview2.findViewById(R.id.fragment_show_button3);
 //
-//        setData(null);
 //    }
 //
 //    @Override
 //    void initData(Object data) {
-//
 //
 //        mAdapter2 = new ComPagerAdapter(manager);
 //        mAdapter2.addFragment(fragmentAll, "fileslist")
@@ -127,7 +125,7 @@
 //        public void onClick(View v) {
 //            if (v.getId() == bt1.getId()) {
 //                manager.beginTransaction()
-//                        .replace(R.id.main_fragment_holder, new ListImages(getContext()))
+//                        .replace(R.id.main_fragment_holder, new ListImagesCopy3(getContext()))
 //                        .commit();
 //            }
 //            if (v.getId() == bt2.getId()) {

@@ -22,7 +22,7 @@
 //import tools.RefreshLayout;
 //
 ////显示所有文件
-//public class ListImagesCopy3 extends BaseFragment<List<ImageInfo>> {
+//public class ListImagesCopy3 extends BaseFragment3<List<ImageInfo>> {
 //    ListView list;
 //    ListAdapter mAdapter;
 //

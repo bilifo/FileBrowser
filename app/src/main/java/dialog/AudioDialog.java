@@ -1,22 +1,35 @@
 package dialog;
 
 import android.content.Context;
+import android.media.MediaPlayer;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.List;
+
+import bean.ImageInfo;
 import item.PlayOrPauseItem;
 
 /**
+ * 后续改进:
+ *      1/要与播放引擎隔离,这样在更换播放引擎框架时,就不需要改该类.
+ *          --不对啊,更换引擎就是修改该类啊.该改进作废
+ *
  * Created by PanJunLong on 2017/10/18.
  */
 
-public class AudioDialog extends BaseDialogFragment {
+public class AudioDialog extends BaseDialogFragment<List<ImageInfo>> {
 
     PlayOrPauseItem playItem;
     ViewGroup.LayoutParams params;
+    List<ImageInfo> datas;
+
+    MediaPlayer player;
 
     @Override
     View initIncludeView(Context mContext) {
+        player =new MediaPlayer();
+
         playItem = new PlayOrPauseItem(mContext);
 //        Window window = this.getDialog().getWindow();
 //        DisplayMetrics dm2 = getResources().getDisplayMetrics();
@@ -30,8 +43,8 @@ public class AudioDialog extends BaseDialogFragment {
     }
 
     @Override
-    void initData(Object data) {
-
+    void initData(List<ImageInfo> data) {
+        datas = data;
     }
 
 
@@ -41,7 +54,7 @@ public class AudioDialog extends BaseDialogFragment {
                 new PlayOrPauseItem.OnMadioPlayClickListener() {
                     @Override
                     public void onClick(View view) {
-
+//                        player.setDataSource(datas);
                     }
                 }, new PlayOrPauseItem.OnMadioPauseClickListener() {
                     @Override

@@ -11,6 +11,8 @@ import com.setproject.bilifo.mypictrue.R;
 import bean.ImageInfo;
 
 /**
+ * 对应R.layout.fragment_list_item的 itemXml类
+ *
  * Created by PanJunLong on 2017/10/19.
  */
 

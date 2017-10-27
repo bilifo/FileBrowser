@@ -15,6 +15,10 @@ import java.util.List;
 import bean.ImageInfo;
 
 /**
+ * 包含了viewpager的弹出框来显示图片.
+ *
+ * 后续改进:
+ *      定位到当前图片,而不是重新从第一张开始
  * Created by PanJunLong on 2017/10/18.
  */
 

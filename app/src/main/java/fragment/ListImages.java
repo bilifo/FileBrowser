@@ -65,6 +65,7 @@ public class ListImages extends BaseFragment {
         }
     };
 
+
     @Override
     void initData() {
 //        alldata = new SDScanUtils(getContext()).getSDPictureUris();

@@ -18,6 +18,8 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
+import java.util.Collection;
+
 import tools.MyLog;
 
 /**
@@ -59,6 +61,7 @@ public abstract class BaseDialogFragment<T> extends DialogFragment implements My
     private RelativeLayout.LayoutParams includeviewparams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
     private T data;//数据
+    private Collection<T> dataArray;//数据集
     /**
      * dialog的总体大小比例:0~1
      */
@@ -223,6 +226,14 @@ public abstract class BaseDialogFragment<T> extends DialogFragment implements My
     public void setData(T data) {
         this.data = data;
     }
+
+    public void setData(T data,int position) {
+        this.data = data;
+    }
+
+//    public void setDataArray(Collection<T> data){
+//        this.dataArray = data;
+//    }
 
     /**
      * 设置dialog大小系数

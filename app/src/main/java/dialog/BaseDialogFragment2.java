@@ -1,45 +1,74 @@
-package fragment;
+package dialog;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.view.ContextMenu;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.animation.Animation;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 
 import tools.MyLog;
 
 /**
- * Fragment是activity的界面中的一部分或一种行为。
- * Fragment不能独立存在，它必须嵌入到activity中，而且Fragment的生命周期直接受所在的activity的影响。
- * 例如：当activity暂停时，它拥有的所有的Fragment们都暂停了
- *  生命周期:
- *      onAttach--->(如果是fragment中添加fragment)onAttachFragment()--->onCreate--->onCreateView
- *      ------(自己封装)getRootViewId()---(自己封装)initView()---(自己封装)initListener()
- *      --->onActivityCreated--->onViewStateRestored--->onStart--->onResume---(自己封装)initData()
- *      --->用户操作退出--->onPause--->onStop--->onDestroyView--->onDestroy--->onDetach
- * @param <T>
+ * 这是对前一个版本,在设置数据的方式上修改.使用了handler来通知当前处于哪个生命周期
+ * <p>
+ * * 一个带关闭按钮的通用动态dialogfragmnet模板.
+ * (注意,生命周期是从show开始的.getdialog在除了生命周期以外的地方使用,可能会引起空指针问题.)
+ * 使用方式:
+ * 1/子类实现该类,实现各个方法
+ * 2/子类的initIncludeView是返回要填充内容的View
+ * 3/new 并show
+ * <p>
+ * <p>
+ * 生命周期:
+ * <p>
+ * initIncludeView(在onCreateView中)--->initListener(在onCreateView中)--->initData(在onResume中)
+ *
+ * @param <T> 数据的类型
  */
-public abstract class BaseFragment<T> extends Fragment implements MyLog.ThisClassCloseLog {
+public abstract class BaseDialogFragment2<T> extends DialogFragment implements MyLog.ThisClassCloseLog {
+    boolean isExternalClick = false;//是否允许接收外部的点击而消失.依需要修改
 
-    abstract void initView(View view);
+    /**
+     * 实现待添加的VIew
+     */
+    abstract View initIncludeView(Context mContext);
 
+    /**
+     * 初始化需要赋值给各个控件的数据
+     */
     abstract void initData();
 
-    abstract void initListener();
+    /**
+     * 正式的把数据分配给各个控件
+     */
+    abstract void setViewData();
 
-    abstract int getRootViewId();// 返回rootview的id，必须实现
+    abstract void initListener();
 
     private Context mContext;
 
@@ -47,41 +76,145 @@ public abstract class BaseFragment<T> extends Fragment implements MyLog.ThisClas
         return mContext;
     }
 
-    private View rootview;
+    private ViewGroup rootview;
+    private View includeview;
+    private ImageView close;
 
-    public View getRootView() {
-        return rootview;
-    }
+    private RelativeLayout.LayoutParams rootviewparams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+    private RelativeLayout.LayoutParams clickviewparams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+    private RelativeLayout.LayoutParams includeviewparams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        MyLog.showLog(getActivity(), "---" + "onCreateView:start" + "---");
-        if (getRootViewId() == 0) {
-            try {
-                throw new Throwable("getRootViewId() return 0.");
-            } catch (Throwable e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+//    private T data;//数据
+//    private Collection<T> dataArray;//数据集
+    /**
+     * dialog的总体大小比例:0~1
+     */
+    double DIALOG_SIZE_SCALE = 1.0;
+
+    //用来获得当前生命周期
+    private Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case 0:
+                    initData();
+                    break;
             }
-        } else {
-            rootview = inflater.inflate(getRootViewId(), container, false);
-            initView(rootview);
-            initListener();
         }
-        return rootview;
+    };
+
+
+    public BaseDialogFragment2() {
+
     }
+
+
+    public View getIncludeview() {
+        return includeview;
+    }
+
+    public ImageView getCloseView() {
+        return close;
+    }
+
+//    /**
+//     * 给dialog设置数据
+//     *
+//     * @param data
+//     */
+//    public void setData(T data) {
+//        this.data = data;
+//    }
+//
+//    public void setData(T data, int position) {
+//        this.data = data;
+//    }
 
 
     /**
-     * 当用户可以看到片段时调用。这通常与活动有关。内部包含调用activity的onStart。
-     * 后接onResume
+     * 设置dialog大小系数
+     *
+     * @param scale
+     */
+    public void setDialogSize(double scale) {
+        if (scale > 0 && scale <= 1) {
+            DIALOG_SIZE_SCALE = scale;
+        }
+    }
+
+
+    //*************继承的fragment的生命周期**********
+
+    /**
+     * 实现用户可见的界面
+     * 后接onActivityCreated
      * 重写fragment的方法.
+     *
+     * @param savedInstanceState
      */
     @Override
-    public void onStart() {
-        MyLog.showLog(getActivity(), "---" + "onStart:start" + "---");
-        super.onStart();
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        getDialog().getWindow().setBackgroundDrawable(new ColorDrawable(Color.argb(127, 127, 127, 127)));//背景透明
+        getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE); //去除标题栏
+//        getDialog().getWindow().setLayout(300,200); //宽高.实测无用,定制dialog的大小,还是依据includeview的大小来吧
+
+//        getDialog().setCanceledOnTouchOutside(isExternalClick);//设置点击dialog外部是否取消弹框
+
+        //点击返回键不消失，需要监听OnKeyListener:
+        getDialog().setOnKeyListener(new DialogInterface.OnKeyListener() {
+            @Override
+            public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
+                if (keyCode == KeyEvent.KEYCODE_BACK) {
+                    return true;
+                }
+                return false;
+            }
+        });
+        //**注意,getdialog在除了生命周期以外的地方使用,可能会引起空指针问题.生命周期是从show开始的
+
+        //通过DisplayMetrics获得当前屏幕大小,并对dialog显示大小做出限制
+        Window window = this.getDialog().getWindow();
+        DisplayMetrics dm2 = getResources().getDisplayMetrics();
+        WindowManager.LayoutParams p = window.getAttributes(); // 获取对话框当前的参数值
+        p.height = (int) (dm2.heightPixels * DIALOG_SIZE_SCALE); // 改变的是dialog框在屏幕中的位置而不是大小
+        p.width = (int) (dm2.widthPixels * DIALOG_SIZE_SCALE); // 宽度设置为屏幕的0.65
+        window.setAttributes(p);
+
+        //根布局
+        rootview = new RelativeLayout(mContext);
+        rootview.setLayoutParams(rootviewparams);
+
+        //代添加布局.依赖ListViewItem
+
+        includeview = initIncludeView(mContext);
+        //当引入的布局不是相对布局,而是其他布局时,获得宽高
+        if (includeview.getLayoutParams() != null) {
+            ViewGroup.LayoutParams tempparams = includeview.getLayoutParams();
+            includeviewparams.width = tempparams.width;
+            includeviewparams.height = tempparams.height;
+        }
+        includeviewparams.addRule(RelativeLayout.CENTER_IN_PARENT);
+        includeview.setLayoutParams(includeviewparams);
+
+        includeview.setId(View.generateViewId());
+        rootview.addView(includeview);
+        //关闭按钮
+        close = new ImageView(mContext);
+        close.setBackgroundResource(android.R.drawable.btn_dialog);
+        close.setId(View.generateViewId());
+        clickviewparams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+        clickviewparams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+        close.setLayoutParams(clickviewparams);
+        rootview.addView(close);
+
+        close.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dismiss();
+            }
+        });
+
+        return rootview;
     }
 
     /**
@@ -127,7 +260,8 @@ public abstract class BaseFragment<T> extends Fragment implements MyLog.ThisClas
     public void onResume() {
         MyLog.showLog(getActivity(), "---" + "onResume:start" + "---");
         super.onResume();
-        initData();
+        mHandler.removeMessages(0);
+        mHandler.sendMessage(mHandler.obtainMessage(0));
     }
 
     /**
@@ -439,6 +573,8 @@ public abstract class BaseFragment<T> extends Fragment implements MyLog.ThisClas
     public void onCreate(Bundle savedInstanceState) {
         MyLog.showLog(getActivity(), "---" + "onCreate:start" + "---");
         super.onCreate(savedInstanceState);
+        //设置dialog全屏显示
+        setStyle(STYLE_NO_FRAME, android.R.style.Theme_Holo_Light);
     }
 
     /**
@@ -455,7 +591,16 @@ public abstract class BaseFragment<T> extends Fragment implements MyLog.ThisClas
 
     }
 
-
+    /**
+     * 当用户可以看到片段时调用。这通常与活动有关。内部包含调用activity的onStart。
+     * 后接onResume
+     * 重写fragment的方法.
+     */
+    @Override
+    public void onStart() {
+        MyLog.showLog(getActivity(), "---" + "onStart:start" + "---");
+        super.onStart();
+    }
 
     @Override
     public void onStop() {
@@ -474,6 +619,7 @@ public abstract class BaseFragment<T> extends Fragment implements MyLog.ThisClas
 
     /**
      * 生命周期的起点
+     *
      * @param context
      */
     @Override
@@ -491,6 +637,31 @@ public abstract class BaseFragment<T> extends Fragment implements MyLog.ThisClas
         super.onDetach();
     }
 
+    /**
+     * 生命周期
+     * 在oncreate之前调用???
+     *
+     * @param savedInstanceState
+     * @return
+     */
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        MyLog.showLog(getActivity(), "---" + "onCreateDialog:start" + "---");
+        return super.onCreateDialog(savedInstanceState);
+    }
+
+
+    @Override
+    public void onCancel(DialogInterface dialog) {
+        MyLog.showLog(getActivity(), "---" + "onCancel:start" + "---");
+        super.onCancel(dialog);
+    }
+
+    @Override
+    public void onDismiss(DialogInterface dialog) {
+        MyLog.showLog(getActivity(), "---" + "onDismiss:start" + "---");
+        super.onDismiss(dialog);
+    }
 
 
 }

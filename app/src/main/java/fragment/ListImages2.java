@@ -115,7 +115,7 @@ public class ListImages2 extends BaseFragment {
         public void onItemClick(AdapterView<?> parent, View view, int position,
                                 long id) {
             AudioDialog dialog=new AudioDialog();
-
+            dialog.setData(data);
             dialog.show(getChildFragmentManager(),"dialog2");
         }
     };
