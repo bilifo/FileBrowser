@@ -227,9 +227,9 @@ public abstract class BaseDialogFragment<T> extends DialogFragment implements My
         this.data = data;
     }
 
-    public void setData(T data,int position) {
-        this.data = data;
-    }
+//    public void setData(T data,int position) {
+//        this.data = data;
+//    }
 
 //    public void setDataArray(Collection<T> data){
 //        this.dataArray = data;

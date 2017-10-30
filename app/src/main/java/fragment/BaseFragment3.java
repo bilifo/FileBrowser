@@ -39,9 +39,9 @@
 //    abstract int getRootViewId();// 返回rootview的id，必须实现
 //
 //    //*****构造方法****
-//    public BaseFragment3(Context context) {
-//        this.mContext = context;
-//    }
+////    public BaseFragment3(Context context) {
+////        this.mContext = context;
+////    }
 //
 //    //*****内部属性和get/set方法
 //    private Context mContext;
@@ -68,14 +68,14 @@
 //        return data;
 //    }
 //
-//    boolean isExecOnresume;
+//    boolean isExecOnresume2;
 //    //用来获得当前生命周期
 //    private Handler mHandler = new Handler() {
 //        @Override
 //        public void handleMessage(Message msg) {
 //            switch (msg.what) {
 //                case 0:
-//                    if (data != null && (isExecOnresume==true)) {
+//                    if (data != null && (isExecOnresume2==true)) {
 //                        mHandler.removeMessages(0);
 //                        initData(data);
 //                    } else {
@@ -115,7 +115,7 @@
 //    public void onCreate(Bundle savedInstanceState) {
 //        MyLog.showLog(getActivity(), "---" + "onCreate:start" + "---");
 //        super.onCreate(savedInstanceState);
-//        isExecOnresume=false;
+////        isExecOnresume=false;
 //    }
 //
 //    @Override
@@ -167,7 +167,7 @@
 //    public void onResume() {
 //        MyLog.showLog(getActivity(), "---" + "onResume:start" + "---");
 //        super.onResume();
-//        isExecOnresume=true;
+//        isExecOnresume2=true;
 ////        mHandler.removeMessages(0);
 //        mHandler.sendMessage(mHandler.obtainMessage(0));
 //    }

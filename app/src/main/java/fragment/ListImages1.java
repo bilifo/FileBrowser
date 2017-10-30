@@ -55,6 +55,7 @@ public class ListImages1 extends BaseFragment {
     void initData() {
         findFileUtil2=FindFileUtil.getNewInstance();
         mAdapter = new ListAdapter(getContext(), data);
+
         list.setAdapter(mAdapter);
         tv.setText("" + "text");
     }
@@ -115,6 +116,7 @@ public class ListImages1 extends BaseFragment {
                                 long id) {
             ImageDialog dialog=new ImageDialog(getContext());
             dialog.setData(data);
+            dialog.goItemPositin(position);
             dialog.show(getChildFragmentManager(),"dialog1");
         }
     };

@@ -38,9 +38,9 @@
 //
 //    FindFileUtil findFileUtil2;
 //
-//    public ListImagesCopy3(Context context) {
-//        super(context);
-//    }
+////    public ListImagesCopy3(Context context) {
+////        super(context);
+////    }
 //
 //
 ////    Handler mHandler=new Handler(){
