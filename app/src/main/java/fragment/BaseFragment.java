@@ -29,6 +29,9 @@ import tools.MyLog;
  *      ------(自己封装)getRootViewId()---(自己封装)initView()---(自己封装)initListener()
  *      --->onActivityCreated--->onViewStateRestored--->onStart--->onResume---(自己封装)initData()
  *      --->用户操作退出--->onPause--->onStop--->onDestroyView--->onDestroy--->onDetach
+ *
+ *  改进:
+ *      用handler来分离数据和生命周期
  * @param <T>
  */
 public abstract class BaseFragment<T> extends Fragment implements MyLog.ThisClassCloseLog {

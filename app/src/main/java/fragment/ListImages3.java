@@ -21,6 +21,7 @@ import java.util.List;
 import adapter.ListAdapter;
 import bean.ImageInfo;
 import data.ImageInfoData;
+import dialog.VedioDialog;
 import tools.FindFileUtil;
 import tools.RefreshLayout;
 
@@ -113,6 +114,11 @@ public class ListImages3 extends BaseFragment {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position,
                                 long id) {
+
+            VedioDialog dialog=new VedioDialog();
+            dialog.setData(data);
+            dialog.goItemPositin(position);
+            dialog.show(getChildFragmentManager(),"dialog3");
         }
     };
 

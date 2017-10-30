@@ -116,6 +116,7 @@ public class ListImages2 extends BaseFragment {
                                 long id) {
             AudioDialog dialog=new AudioDialog();
             dialog.setData(data);
+            dialog.goItemPositin(position);
             dialog.show(getChildFragmentManager(),"dialog2");
         }
     };

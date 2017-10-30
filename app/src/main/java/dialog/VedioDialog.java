@@ -6,6 +6,8 @@ import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Handler;
 import android.os.Message;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -18,15 +20,10 @@ import bean.ImageInfo;
 import item.PlayOrPauseItem;
 
 /**
- * 后续改进:
- * 1/要与播放引擎隔离,这样在更换播放引擎框架时,就不需要改该类.
- * --不对啊,更换引擎就是修改该类啊.该改进作废
- * <p>
- * Created by PanJunLong on 2017/10/18.
+ * Created by PanJunLong on 2017/10/30.
  */
 
-public class AudioDialog extends BaseDialogFragment<List<ImageInfo>> {
-
+public class VedioDialog extends BaseDialogFragment<List<ImageInfo>> {
     PlayOrPauseItem playItem;
     TextView textView;
 
@@ -34,14 +31,13 @@ public class AudioDialog extends BaseDialogFragment<List<ImageInfo>> {
     List<ImageInfo> datas;
 
     MediaPlayer player;
+    SurfaceView mSurfaceView;
 
     int itemposition = -1;
     Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
-
-
                 case 1:
                     if (isDataLoaded == true && itemposition != -1) {
                         textView.setText(datas.get(itemposition).getName());
@@ -49,6 +45,7 @@ public class AudioDialog extends BaseDialogFragment<List<ImageInfo>> {
                             player.reset();
                             player.setDataSource(datas.get(itemposition).getPath());
                             player.prepare();
+                            player.start();
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -58,6 +55,7 @@ public class AudioDialog extends BaseDialogFragment<List<ImageInfo>> {
                             player.reset();
                             player.setDataSource(datas.get(0).getPath());
                             player.prepare();
+                            player.start();
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -76,6 +74,7 @@ public class AudioDialog extends BaseDialogFragment<List<ImageInfo>> {
 
     @Override
     View initIncludeView(Context mContext) {
+
         player = new MediaPlayer();
 
         LinearLayout layout=new LinearLayout(mContext);
@@ -85,11 +84,20 @@ public class AudioDialog extends BaseDialogFragment<List<ImageInfo>> {
 
         textView=new TextView(mContext);
         textView.setTextColor(Color.WHITE);
-        layout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT));
+        LinearLayout.LayoutParams mparams=new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,0);
+        mparams.weight=1;
+        textView.setLayoutParams(mparams);
         layout.addView(textView);
 
+        mSurfaceView=new SurfaceView(mContext);
+        LinearLayout.LayoutParams mparams2=new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,0);
+        mparams2.weight=5;
+        mSurfaceView.setLayoutParams(mparams2);
+        mSurfaceView.getHolder().addCallback(callback);
+        layout.addView(mSurfaceView);
+
         playItem = new PlayOrPauseItem(mContext);
-//        playItem.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT));
+        playItem.getRootView().setLayoutParams(mparams);
         layout.addView(playItem.getRootView());
 
         return layout.getRootView();
@@ -161,10 +169,27 @@ public class AudioDialog extends BaseDialogFragment<List<ImageInfo>> {
         mHandler.sendMessage(mHandler.obtainMessage(1));
     }
 
+    SurfaceHolder.Callback callback=new SurfaceHolder.Callback() {
+        @Override
+        public void surfaceCreated(SurfaceHolder surfaceHolder) {
+            player.setDisplay(surfaceHolder);
+
+        }
+
+        @Override
+        public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {
+
+        }
+
+        @Override
+        public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
+
+        }
+    };
+
     @Override
     public void onDismiss(DialogInterface dialog) {
         super.onDismiss(dialog);
         player.reset();
     }
-
 }
