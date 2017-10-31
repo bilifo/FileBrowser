@@ -20,8 +20,8 @@ public class FindFileUtil {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-//                    scan("/mnt/udisk");
-                    scan("/storage/emulated/0/");
+                    scan("/mnt/udisk");
+//                    scan("/storage/emulated/0/");
                     isScan = false;
                 }
             }).start();

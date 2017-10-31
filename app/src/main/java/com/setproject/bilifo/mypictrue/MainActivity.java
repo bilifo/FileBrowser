@@ -38,6 +38,9 @@ public class MainActivity extends FragmentActivity {
 
         manager.beginTransaction().replace(R.id.main_fragment_holder,
                 new ShowImages2()).commit();
+
+//        manager.beginTransaction().replace(R.id.main_fragment_holder,
+//                new ShowImages3()).commit();
 //		manager.beginTransaction().replace(R.id.main_fragment_holder,
 //		new ListImages2()).commit();
     }
